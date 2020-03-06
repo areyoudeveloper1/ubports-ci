@@ -1,0 +1,86 @@
+#=================================================
+# Description: Build ubports using GitHub Actions
+# Lisence: MIT
+# Contributor: 0312birdzhang
+# Maintainer: Danct12
+# Credit: https://github.com/P3TERX/Actions-OpenWrt
+#=================================================
+
+name: Build System Image
+
+on: 
+  push:
+    branches:
+      - master
+  release:
+    types: [published]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-16.04
+
+    env:
+      VENDOR: xiaomi
+      DEVICE: rolex
+      ANDROID_ROOT: /home/runner/work/halium/
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Initialization environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+        openjdk-8-jdk android-tools-adb bc \
+        bison build-essential curl flex g++-multilib \
+        gcc-multilib gnupg gperf imagemagick lib32ncurses5-dev \
+        lib32readline-dev lib32z1-dev libesd0-dev liblz4-tool \
+        libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-dev \
+        libxml2 libxml2-utils lzop pngcrush rsync schedtool \
+        squashfs-tools xsltproc yasm zip zlib1g-dev git
+        sudo docker rmi `docker images -q`
+        sudo rm -rf \
+          /usr/share/dotnet \
+          /etc/mysql \
+          /etc/php
+        mkdir -p ~/bin
+        wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
+        chmod +x ~/bin/repo
+        git config --global user.name "UBports Redmi 4A CI"
+        git config --global user.email "thisemaildoesnotexist@exist.com"
+
+    - name: Downloading source code
+      run: |
+        source halium.env
+        mkdir -p $ANDROID_ROOT
+        cd $ANDROID_ROOT
+        repo init -u https://github.com/Halium/android -b halium-7.1 --depth=1
+        mkdir -p $ANDROID_ROOT/.repo/local_manifests
+        wget https://raw.githubusercontent.com/areyoudeveloper1/halium-devices/halium-7.1/manifests/"$VENDOR"_"$DEVICE".xml -O $ANDROID_ROOT/.repo/local_manifests/$DEVICE.xml
+        repo sync -j8 -c --no-clone-bundle --no-tags
+    
+    - name: Build HAL
+      run: |
+        chmod +x build-hal.sh
+        bash -x build-hal.sh
+      shell: bash
+
+    - name : Upload boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: halium-boot image
+        path: /home/runner/work/halium/out/target/product/rolex/halium-boot.img
+
+    - name : Upload recovery image
+      uses: actions/upload-artifact@master
+      with:
+        name: Recovery image
+        path: /home/runner/work/halium/out/target/product/rolex/recovery.img
+
+    - name : Upload system image
+      uses: actions/upload-artifact@master
+      with:
+        name: System image
+        path: /home/runner/work/halium/out/target/product/rolex/system.img

@@ -72,12 +72,6 @@ jobs:
       with:
         name: halium-boot image
         path: /home/runner/work/halium/out/target/product/rolex/halium-boot.img
-  
-   - name : Upload boot image
-      uses: actions/upload-artifact@master
-      with:
-        name: hybris-boot image
-        path: /home/runner/work/halium/out/target/product/rolex/hybris-boot.img
 
     - name : Upload recovery image
       uses: actions/upload-artifact@master

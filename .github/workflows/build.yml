@@ -58,7 +58,7 @@ jobs:
         cd $ANDROID_ROOT
         repo init -u https://github.com/Halium/android -b halium-7.1 --depth=1
         mkdir -p $ANDROID_ROOT/.repo/local_manifests
-        wget https://raw.githubusercontent.com/Halium/halium-devices/halium-7.1/manifests/xiaomi_rolex.xmlhttps://raw.githubusercontent.com/Halium/halium-devices/halium-7.1/manifests/"$VENDOR"_"$DEVICE".xml -O $ANDROID_ROOT/.repo/local_manifests/$DEVICE.xml
+        wget https://raw.githubusercontent.com/Halium/halium-devices/halium-7.1/manifests/"$VENDOR"_"$DEVICE".xml -O $ANDROID_ROOT/.repo/local_manifests/$DEVICE.xml
         repo sync -j8 -c --no-clone-bundle --no-tags
     
     - name: Build HAL

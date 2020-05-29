@@ -66,6 +66,12 @@ jobs:
         chmod +x build-hal.sh
         bash -x build-hal.sh
       shell: bash
+    
+    - name : Upload boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: halium-boot image
+        path: /home/runner/work/halium/out/target/product/rolex/hybris-boot.img
 
     - name : Upload boot image
       uses: actions/upload-artifact@master
